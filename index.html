@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffe6f0" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <title>실험실 컨디션 운세소 · Lab Fortune</title>
+  <meta name="description" content="실험복을 입은 연구원들이 오늘의 컨디션을 분석해 실험 운세 카드를 뽑아드립니다." />
+  <meta property="og:title" content="🧪 실험실 컨디션 운세소" />
+  <meta property="og:description" content="오늘의 실험, 별이 아니라 데이터가 점쳐 드립니다." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" />
+  <style>
+    :root{
+      --bg0:#fff2f7; --bg1:#ffe5ef;
+      --surface:#ffffff; --surface-2:#fff5f9;
+      --ink:#5a3a47; --ink-dim:#9a7d88; --ink-faint:#c2a8b3;
+      --line:#ffdbe8; --line-2:#ffc7db;
+      --pink:#ff8fb4; --pink-d:#f86a9b; --pink-ink:#c64f7e;
+      --lab:#7fd3c8; --lab-d:#46b9ad;
+      --good:#e85d92; --neu:#d99a2e; --warn:#b07be0;
+      --radius:26px;
+      --shadow-sm:0 4px 14px #b76a8a1f;
+      --shadow:0 18px 44px #d56a921f, 0 4px 12px #d56a9214;
+      --font:'Pretendard',system-ui,sans-serif;
+      --display:'Jua','Pretendard',sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{-webkit-text-size-adjust:100%;}
+    body{min-height:100dvh;font-family:var(--font);color:var(--ink);
+      background:
+        radial-gradient(900px 500px at 50% -10%, #ffffffcc 0%, transparent 60%),
+        radial-gradient(700px 600px at 100% 0%, #ffd6e8aa 0%, transparent 55%),
+        radial-gradient(700px 600px at 0% 100%, #ffe0d0aa 0%, transparent 55%),
+        linear-gradient(160deg, var(--bg0), var(--bg1));
+      background-attachment:fixed;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+    .bg-floaties{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+    .bg-floaties span{position:absolute;font-size:28px;opacity:.12;animation:drift 18s ease-in-out infinite;}
+    .bg-floaties span:nth-child(1){left:8%;top:18%;}
+    .bg-floaties span:nth-child(2){left:84%;top:24%;font-size:34px;animation-delay:-3s;}
+    .bg-floaties span:nth-child(3){left:14%;top:72%;font-size:30px;animation-delay:-6s;}
+    .bg-floaties span:nth-child(4){left:78%;top:68%;animation-delay:-9s;}
+    .bg-floaties span:nth-child(5){left:46%;top:12%;animation-delay:-12s;}
+    .bg-floaties span:nth-child(6){left:60%;top:84%;font-size:24px;animation-delay:-15s;}
+    @keyframes drift{0%,100%{transform:translateY(0) rotate(-6deg);}50%{transform:translateY(-22px) rotate(6deg);}}
+
+    .wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:clamp(24px,6vw,44px) 18px 72px;min-height:100dvh;display:flex;flex-direction:column;justify-content:center;}
+    .screen{display:none;animation:fadeUp .5s cubic-bezier(.2,.8,.2,1);}
+    .screen.active{display:block;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+
+    .card-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:clamp(22px,5vw,30px);}
+    .badge-row{display:flex;justify-content:center;gap:8px;margin-bottom:14px;}
+    .pill{font-size:12px;font-weight:600;color:var(--pink-ink);background:#ffe1ec;border:1px solid #ffc7db;border-radius:999px;padding:5px 13px;}
+
+    .opening{text-align:center;}
+    .scene{position:relative;margin:6px auto;width:100%;max-width:390px;}
+    .scene svg{width:100%;height:auto;display:block;filter:drop-shadow(0 16px 24px #d56a9220);}
+    .bubble{animation:bob 3s ease-in-out infinite;transform-origin:center;}
+    .bubble.b2{animation-delay:-1s;} .bubble.b3{animation-delay:-2s;}
+    @keyframes bob{50%{transform:translateY(-6px);}}
+    .liquid-wave{animation:slosh 4s ease-in-out infinite;transform-origin:center;}
+    @keyframes slosh{50%{transform:scaleY(1.06);}}
+    .twinkle{animation:tw 2.2s ease-in-out infinite;transform-origin:center;}
+    @keyframes tw{0%,100%{opacity:.4;transform:scale(.85);}50%{opacity:1;transform:scale(1.1);}}
+    .opening h1{font-family:var(--display);font-size:clamp(30px,8.5vw,42px);line-height:1.18;margin-top:8px;}
+    .opening h1 .hl{color:var(--pink-d);}
+    .opening .lead{margin-top:14px;color:var(--ink-dim);font-size:15px;line-height:1.7;}
+    .cta{margin-top:24px;width:100%;padding:17px;border:none;border-radius:18px;cursor:pointer;font-family:var(--display);font-size:19px;color:#7a2348;background:linear-gradient(180deg,#ffc2d6,var(--pink) 55%,var(--pink-d));box-shadow:0 12px 26px #ff8fb455,inset 0 1px 0 #ffffff90;transition:transform .15s,box-shadow .15s;}
+    .cta:hover{transform:translateY(-2px);box-shadow:0 18px 34px #ff8fb466;}
+    .cta:active{transform:translateY(0);}
+    .mini-note{margin-top:14px;color:var(--ink-faint);font-size:12px;}
+
+    .form-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+    .form-head .ic{width:46px;height:46px;flex:none;}
+    .form-head h2{font-family:var(--display);font-size:22px;}
+    .form-head p{font-size:12.5px;color:var(--ink-dim);margin-top:2px;}
+    .sec{display:flex;align-items:center;gap:9px;margin:26px 0 14px;font-weight:700;font-size:13.5px;color:var(--pink-ink);}
+    .sec .si{width:22px;height:22px;flex:none;}
+    .sec::after{content:'';flex:1;height:1px;background:var(--line);}
+    .sec:first-of-type{margin-top:6px;}
+
+    .weather-row{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;}
+    .wbox{flex:1;min-width:96px;display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:15px;padding:11px 13px;background:var(--surface-2);}
+    .wbox .wi{width:30px;height:30px;flex:none;}
+    .wbox .wt{font-size:11.5px;color:var(--ink-dim);}
+    .wbox .wv{font-size:19px;font-weight:700;line-height:1.1;}
+    .wbtn{flex:1;min-width:140px;}
+    .ghost{font-family:var(--font);font-size:13.5px;font-weight:600;color:var(--pink-ink);background:var(--surface);border:1px solid var(--line-2);border-radius:14px;padding:12px 14px;cursor:pointer;transition:all .16s;white-space:nowrap;}
+    .ghost:hover{background:var(--surface-2);border-color:var(--pink);}
+    .hint{font-size:12px;color:var(--ink-dim);margin:10px 2px 0;line-height:1.6;}
+
+    .datewrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .dateinput{flex:1;min-width:160px;font-family:var(--font);font-size:15px;color:var(--ink);background:var(--surface-2);border:1.5px solid var(--line);border-radius:15px;padding:12px 14px;outline:none;transition:border-color .16s,box-shadow .16s;}
+    .dateinput:focus{border-color:var(--pink);box-shadow:0 0 0 4px #ff8fb41f;}
+    .daychip{font-family:var(--display);font-size:16px;color:var(--pink-ink);background:#ffe1ec;border:1px solid #ffc7db;border-radius:13px;padding:9px 16px;}
+
+    .slider-wrap{display:flex;align-items:center;gap:18px;}
+    .slider-ic{width:74px;height:90px;flex:none;}
+    .slider-ctrl{flex:1;}
+    .slider-ctrl .lab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+    .slider-ctrl .lab span:first-child{font-size:13.5px;font-weight:600;}
+    .slider-ctrl .lab b{font-size:22px;color:var(--pink-d);font-family:var(--display);}
+    .slider-ctrl .lab small{font-size:12px;color:var(--ink-faint);}
+    input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:7px;border-radius:7px;background:linear-gradient(90deg,#ffd6e6,var(--pink));outline:none;}
+    input[type=range].sugar{background:linear-gradient(90deg,#ffe2c2,#ff9ec0);}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid var(--pink);box-shadow:0 3px 8px #ff8fb455;cursor:pointer;}
+    input[type=range]::-moz-range-thumb{width:24px;height:24px;border:3px solid var(--pink);border-radius:50%;background:#fff;cursor:pointer;}
+
+    .field{margin-top:18px;}
+    .field>label{display:block;font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:10px;}
+    .two-col{display:flex;gap:14px;}
+    .two-col>div{flex:1;}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;}
+    .chips.fill .chip{flex:1;}
+    .chip{font-family:var(--font);font-size:13.5px;font-weight:500;color:var(--ink-dim);background:var(--surface-2);border:1.5px solid var(--line);border-radius:13px;padding:10px 10px;cursor:pointer;transition:all .16s;display:flex;align-items:center;justify-content:center;gap:6px;}
+    .chip:hover{border-color:var(--pink);color:var(--ink);transform:translateY(-1px);}
+    .chip.active{background:linear-gradient(180deg,#ffeef4,#ffdbe8);border-color:var(--pink);color:var(--pink-ink);font-weight:700;box-shadow:0 4px 12px #ff8fb433;}
+    .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+
+    .submit{margin-top:26px;width:100%;padding:17px;border:none;border-radius:18px;cursor:pointer;font-family:var(--display);font-size:18px;color:#7a2348;background:linear-gradient(180deg,#ffc2d6,var(--pink) 55%,var(--pink-d));box-shadow:0 12px 26px #ff8fb455,inset 0 1px 0 #ffffff90;transition:transform .15s,box-shadow .15s;}
+    .submit:hover{transform:translateY(-2px);box-shadow:0 18px 34px #ff8fb466;}
+    .submit:active{transform:translateY(0);}
+    .err{color:var(--pink-d);font-size:13px;margin-top:13px;text-align:center;min-height:1em;line-height:1.5;font-weight:600;}
+    .back-link{display:inline-flex;align-items:center;gap:5px;margin-top:16px;background:none;border:none;color:var(--ink-faint);font-size:13px;cursor:pointer;font-family:var(--font);}
+    .back-link:hover{color:var(--ink-dim);}
+
+    .loading{text-align:center;padding:30px 0;}
+    .loading .rig{width:120px;height:120px;margin:0 auto;}
+    .loading p{margin-top:16px;color:var(--ink-dim);font-size:14.5px;font-weight:500;}
+    .spin{transform-origin:60px 60px;animation:spin 1.6s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .blip{animation:blip 1.2s ease-in-out infinite;}
+    @keyframes blip{0%,100%{opacity:.25;}50%{opacity:1;}}
+
+    /* 연구원들이 비커에 조제 → 연기 → 펑 → 타로카드 등장 */
+    .brew-stage{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,245,249,.55);backdrop-filter:blur(2px);overflow:hidden;}
+    .brew-scene{position:relative;width:min(96vw,760px);}
+    .brew-svg{width:100%;height:auto;display:block;filter:drop-shadow(0 14px 22px #d56a9226);}
+    .drop{animation:dropIn .9s ease-in infinite;}
+    @keyframes dropIn{0%{transform:translateY(-4px);opacity:0}30%{opacity:1}100%{transform:translateY(38px);opacity:0}}
+    .bub{opacity:0;}
+    .brew-scene.brewing .bub{animation:bubUp 1.1s ease-in-out infinite;}
+    .brew-scene.brewing .bub.b2{animation-delay:.35s}
+    .brew-scene.brewing .bub.b3{animation-delay:.7s}
+    @keyframes bubUp{0%{opacity:0;transform:translateY(6px)}40%{opacity:.9}100%{opacity:0;transform:translateY(-16px)}}
+    .brew-scene.brewing .brewliq{animation:wob 1s ease-in-out infinite;transform-origin:center bottom;}
+    @keyframes wob{50%{transform:scaleY(1.06)}}
+    .smoke{position:absolute;left:48%;top:36%;transform:translateX(-50%);width:520px;height:520px;pointer-events:none;}
+    .smoke i{position:absolute;bottom:0;left:50%;width:168px;height:168px;border-radius:50%;background:radial-gradient(circle,#fffffff2,#ffd9eacc);opacity:0;}
+    .brew-scene.brewing .smoke i{animation:smoke 2.1s ease-out infinite;}
+    .smoke i:nth-child(1){margin-left:-66px;animation-delay:0s}
+    .smoke i:nth-child(2){margin-left:-12px;animation-delay:.26s}
+    .smoke i:nth-child(3){margin-left:-42px;animation-delay:.52s}
+    .smoke i:nth-child(4){margin-left:16px;animation-delay:.78s}
+    .smoke i:nth-child(5){margin-left:-26px;animation-delay:1.04s}
+    .smoke i:nth-child(6){margin-left:2px;animation-delay:1.3s}
+    @keyframes smoke{0%{opacity:0;transform:translate(0,0) scale(.45)}20%{opacity:.95}100%{opacity:0;transform:translate(-34px,-360px) scale(6.2)}}
+    .flash{position:absolute;left:48%;top:40%;width:120px;height:120px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#fff,#ffe9f3 45%,transparent 72%);opacity:0;pointer-events:none;}
+    .brew-scene.boom .flash{animation:flash .62s ease-out;}
+    @keyframes flash{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(32)}}
+    .pop-card{position:absolute;left:48%;top:40%;width:200px;height:288px;margin-left:-100px;margin-top:-144px;border-radius:16px;border:3px solid #fff;
+      background:repeating-linear-gradient(45deg,#ff9ec0 0 11px,#ff90b6 11px 22px),#ff9ec0;box-shadow:0 22px 44px #c25c8255;
+      display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.2) translateY(24px);}
+    .pop-card::after{content:'⚗️';font-size:88px;filter:drop-shadow(0 3px 6px #b04a6a55);}
+    .brew-scene.card-out .pop-card{animation:cardOut .65s cubic-bezier(.2,1.5,.4,1) forwards;}
+    @keyframes cardOut{0%{opacity:0;transform:scale(.2) translateY(28px)}55%{opacity:1}100%{opacity:1;transform:scale(1) translateY(-70px)}}
+    .brew-burst{position:fixed;z-index:60;pointer-events:none;font-size:44px;animation:bburst .85s ease-out forwards;}
+    @keyframes bburst{0%{opacity:0;transform:translate(0,0) scale(.3)}30%{opacity:1}100%{opacity:0;transform:translate(var(--bx,0),var(--by,0)) scale(1.2)}}
+    .brew-hint{margin-top:26px;color:var(--pink-ink);font-weight:700;font-size:15px;animation:pulse 1.5s ease-in-out infinite;}
+    @keyframes pulse{50%{opacity:.4;}}
+    #confetti{position:fixed;top:0;left:0;z-index:10000;pointer-events:none;}
+
+    /* 가운데 둥 뜨는 짤 + 위로 도킹 (잘리지 않게 contain) */
+    .float-meme{position:fixed;z-index:9999;object-fit:contain;filter:drop-shadow(0 18px 36px #00000035);pointer-events:none;
+      transition:top .8s cubic-bezier(.32,.9,.3,1),left .8s cubic-bezier(.32,.9,.3,1),width .8s cubic-bezier(.32,.9,.3,1),height .8s cubic-bezier(.32,.9,.3,1);}
+    .float-meme.pop{animation:popflash .6s ease-out;}
+    @keyframes popflash{0%{transform:scale(.5);filter:brightness(1.6) drop-shadow(0 18px 36px #00000035);}55%{transform:scale(1.08);}100%{transform:scale(1);filter:brightness(1) drop-shadow(0 18px 36px #00000035);}}
+    .sparkburst{position:fixed;z-index:9998;pointer-events:none;font-size:30px;animation:burst .7s ease-out forwards;}
+    @keyframes burst{0%{opacity:0;transform:scale(.3);}40%{opacity:1;}100%{opacity:0;transform:scale(1.4);}}
+
+    .result{position:relative;}
+    .reveal{animation:pop .55s cubic-bezier(.2,1.3,.5,1);}
+    @keyframes pop{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:none;}}
+    .react{position:relative;text-align:center;padding:22px 0 6px;border-radius:22px 22px 0 0;min-height:150px;display:flex;align-items:center;justify-content:center;}
+    .react.s-pos{background:linear-gradient(180deg,#ffe2ee,#fff);}
+    .react.s-neu{background:linear-gradient(180deg,#fff0d9,#fff);}
+    .react.s-neg{background:linear-gradient(180deg,#efe6ff,#fff);}
+    .reactimg{display:block;width:min(72vw,220px);height:170px;object-fit:contain;filter:drop-shadow(0 8px 16px #00000026);border-radius:10px;}
+    .react .face{font-size:74px;line-height:1;}
+    .react .floats{position:absolute;inset:0;pointer-events:none;}
+    .react .floats span{position:absolute;font-size:22px;animation:floaty 2.6s ease-in-out infinite;}
+    @keyframes floaty{0%,100%{transform:translateY(0) rotate(-8deg);opacity:.85;}50%{transform:translateY(-12px) rotate(8deg);opacity:1;}}
+    .result-body{padding:6px 24px 26px;text-align:center;}
+    .grade-meme{font-family:var(--display);font-size:clamp(28px,8vw,36px);line-height:1.2;}
+    .result.s-pos .grade-meme{color:var(--good);}
+    .result.s-neu .grade-meme{color:var(--neu);}
+    .result.s-neg .grade-meme{color:var(--warn);}
+    .grade-trad{margin-top:6px;font-size:12px;letter-spacing:.12em;color:var(--ink-faint);font-weight:600;}
+    .headline{font-family:var(--display);font-size:19px;margin:16px 0 12px;line-height:1.4;}
+    .message{font-size:14.5px;color:var(--ink-dim);line-height:1.95;}
+    .meta-row{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin:18px 0 4px;}
+    .meta{font-size:12px;font-weight:600;color:var(--pink-ink);background:#ffeef4;border:1px solid #ffd2e2;border-radius:999px;padding:6px 11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .tipbox{margin-top:18px;text-align:left;background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:14px 16px;}
+    .tipbox .tt{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--pink-ink);margin-bottom:6px;}
+    .tipbox p{font-size:13px;color:var(--ink);line-height:1.7;}
+    .actions{display:flex;gap:10px;margin-top:18px;}
+    .actions .ghost{flex:1;text-align:center;}
+    .foot{text-align:center;margin-top:22px;color:var(--ink-faint);font-size:11.5px;}
+    .hidden{display:none !important;}
+  </style>
+</head>
+<body>
+  <div class="bg-floaties" aria-hidden="true"><span>🧪</span><span>🎀</span><span>🔬</span><span>🧫</span><span>💗</span><span>🧬</span></div>
+  <canvas id="confetti"></canvas>
+
+  <div class="wrap">
+
+    <section class="screen active" id="screen-opening">
+      <div class="card-panel opening">
+        <div class="badge-row"><span class="pill">🎀 오늘의 실험 운세소</span></div>
+        <div class="scene" aria-hidden="true">
+          <svg viewBox="0 0 390 244" role="img" aria-label="실험복을 입은 귀여운 두 연구원">
+            <text class="twinkle" x="26" y="48" font-size="22" fill="#ff9ec0">✦</text>
+            <text class="twinkle" x="350" y="66" font-size="26" fill="#ffc28a" style="animation-delay:-.7s">✦</text>
+            <text class="twinkle" x="62" y="188" font-size="18" fill="#ffb0cf" style="animation-delay:-1.2s">♥</text>
+            <text class="twinkle" x="330" y="190" font-size="20" fill="#ffb0cf" style="animation-delay:-1.6s">♥</text>
+
+            <!-- 연구원 A -->
+            <g transform="translate(125,52)">
+              <path d="M-34 70 Q-34 55 -17 53 L17 53 Q34 55 34 70 L41 152 Q41 162 31 162 L-31 162 Q-41 162 -41 152 Z" fill="#fff" stroke="#ffd9e6" stroke-width="3"/>
+              <path d="M-7 53 L0 80 L7 53" fill="none" stroke="#ff9ec0" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="-22" cy="150" r="6" fill="#ffd0e0"/><circle cx="22" cy="150" r="6" fill="#ffd0e0"/>
+              <circle cx="0" cy="4" r="42" fill="#ffe1c8"/>
+              <path d="M-42 2 Q-38 -42 0 -42 Q38 -42 42 2 Q20 -18 0 -16 Q-20 -18 -42 2Z" fill="#7b5640"/>
+              <ellipse cx="-24" cy="16" rx="10" ry="6.5" fill="#ffb0c6"/>
+              <ellipse cx="24" cy="16" rx="10" ry="6.5" fill="#ffb0c6"/>
+              <path d="M-22 4 q7 -9 14 0" fill="none" stroke="#5a3f33" stroke-width="4" stroke-linecap="round"/>
+              <path d="M8 4 q7 -9 14 0" fill="none" stroke="#5a3f33" stroke-width="4" stroke-linecap="round"/>
+              <path d="M-7 22 q7 8 14 0" fill="none" stroke="#d97f88" stroke-width="3.2" stroke-linecap="round"/>
+              <g class="bubble" transform="translate(36,124)">
+                <path d="M-8 -22 L-8 -8 L-18 14 a5 5 0 0 0 5 7 L13 21 a5 5 0 0 0 5 -7 L8 -8 L8 -22Z" fill="#fff" stroke="#ff9ec0" stroke-width="2.5"/>
+                <path class="liquid-wave" d="M-14 2 L14 2 L16 14 a5 5 0 0 1 -5 7 L-11 21 a5 5 0 0 1 -5 -7Z" fill="#ffb3d1"/>
+                <circle cx="-2" cy="8" r="2" fill="#fff" opacity=".85"/><circle cx="5" cy="11" r="1.5" fill="#fff" opacity=".75"/>
+                <rect x="-10" y="-24" width="20" height="5" rx="2.5" fill="#ff9ec0"/>
+              </g>
+            </g>
+
+            <!-- 연구원 B -->
+            <g transform="translate(262,60)">
+              <path d="M-32 66 Q-32 52 -16 50 L16 50 Q32 52 32 66 L38 144 Q38 154 29 154 L-29 154 Q-38 154 -38 144 Z" fill="#fff" stroke="#ffd9e6" stroke-width="3"/>
+              <path d="M-6 50 L0 74 L6 50" fill="none" stroke="#ff9ec0" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="0" cy="2" r="40" fill="#ffe6d2"/>
+              <path d="M-40 2 Q-40 -40 0 -40 Q40 -40 40 2 Q38 -14 22 -16 L22 -2 Q0 -20 -22 -2 L-22 -16 Q-38 -14 -40 2Z" fill="#caa0c0"/>
+              <ellipse cx="-22" cy="14" rx="9.5" ry="6" fill="#ffb0c6"/>
+              <ellipse cx="22" cy="14" rx="9.5" ry="6" fill="#ffb0c6"/>
+              <circle cx="-15" cy="3" r="3.4" fill="#5a3f33"/><circle cx="15" cy="3" r="3.4" fill="#5a3f33"/>
+              <circle cx="-13.5" cy="1.5" r="1" fill="#fff"/><circle cx="16.5" cy="1.5" r="1" fill="#fff"/>
+              <path d="M-6 20 q6 6 12 0" fill="none" stroke="#d97f88" stroke-width="3.2" stroke-linecap="round"/>
+              <g class="bubble b2" transform="translate(-34,108)">
+                <path d="M-11 -16 L-11 18 a4 4 0 0 0 4 4 L7 22 a4 4 0 0 0 4 -4 L0 -16Z" fill="#fff" stroke="#7fd3c8" stroke-width="2.5"/>
+                <path class="liquid-wave" d="M-11 6 L9 6 L11 18 a4 4 0 0 1 -4 4 L-7 22 a4 4 0 0 1 -4 -4Z" fill="#a7e6dd"/>
+                <rect x="-12" y="-18" width="14" height="4" rx="2" fill="#7fd3c8"/>
+              </g>
+            </g>
+
+            <rect x="22" y="200" width="346" height="14" rx="7" fill="#ffd2e0"/>
+            <rect x="22" y="196" width="346" height="6" rx="3" fill="#ffe6ee"/>
+            <g class="bubble b3" transform="translate(196,168)"><path d="M-10 0 L-10 20 a4 4 0 0 0 4 4 L6 24 a4 4 0 0 0 4 -4 L10 0Z" fill="#fff" stroke="#ff9ec0" stroke-width="2"/><rect x="-10" y="12" width="20" height="12" fill="#ffc0d8"/></g>
+          </svg>
+        </div>
+        <h1>실험실 <span class="hl">컨디션 운세소</span></h1>
+        <p class="lead">오늘의 컨디션을 데이터로 분석해<br/>실험 운세 카드를 뽑아드려요 🎀</p>
+        <button class="cta" id="start-btn">🧪 분석 시작하기</button>
+        <p class="mini-note">소요 시간 약 30초 · 설치 불필요 · 재미로 즐기세요</p>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-form">
+      <div class="card-panel">
+        <div class="form-head">
+          <svg class="ic" viewBox="0 0 48 48"><rect x="6" y="6" width="36" height="36" rx="12" fill="#ffe1ec"/><path d="M20 14h8v8l6 13a3 3 0 0 1-3 4H17a3 3 0 0 1-3-4l6-13z" fill="#ff8fb4"/><rect x="20" y="12" width="8" height="4" rx="2" fill="#f86a9b"/><circle cx="22" cy="31" r="2" fill="#fff"/><circle cx="27" cy="35" r="1.5" fill="#fff"/></svg>
+          <div><h2>오늘의 검체 접수</h2><p>항목을 채우면 운세가 추출됩니다</p></div>
+        </div>
+
+        <div class="sec"><svg class="si" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3" fill="none" stroke="#ff8fb4" stroke-width="2"/><line x1="4" y1="9" x2="20" y2="9" stroke="#ff8fb4" stroke-width="2"/><line x1="8" y1="3" x2="8" y2="6" stroke="#ff8fb4" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="6" stroke="#ff8fb4" stroke-width="2" stroke-linecap="round"/></svg>실험 날짜</div>
+        <div class="datewrap">
+          <input type="date" id="exp-date" class="dateinput" />
+          <span class="daychip" id="day-badge">— 요일</span>
+        </div>
+
+        <div class="sec"><svg class="si" viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 1 4 4v6.5a5 5 0 1 1-8 0V7a4 4 0 0 1 4-4z" fill="none" stroke="#ff8fb4" stroke-width="2"/><circle cx="12" cy="16.5" r="2.5" fill="#ff8fb4"/></svg>실험실 환경</div>
+        <div class="weather-row">
+          <div class="wbox"><svg class="wi" viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 1 3 3v8a4.5 4.5 0 1 1-6 0V6a3 3 0 0 1 3-3z" fill="none" stroke="#ff8fb4" stroke-width="2"/><circle cx="12" cy="16" r="2.4" fill="#ff8fb4"/></svg><div><div class="wt">기온</div><div class="wv" id="temp-display">—℃</div></div></div>
+          <div class="wbox"><svg class="wi" viewBox="0 0 24 24"><path d="M12 3s7 8 7 12a7 7 0 1 1-14 0c0-4 7-12 7-12z" fill="none" stroke="#7fd3c8" stroke-width="2"/></svg><div><div class="wt">습도</div><div class="wv" id="humid-display">—%</div></div></div>
+          <button class="ghost wbtn" id="weather-btn">📍 현재 위치 날씨</button>
+        </div>
+        <p class="hint" id="weather-hint">버튼을 누르면 현재 위치의 기온·습도를 자동으로 가져옵니다.</p>
+
+        <div class="sec"><svg class="si" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-9.5A4 4 0 0 1 12 7a4 4 0 0 1 7 3c0 5-7 9.5-7 9.5z" fill="none" stroke="#ff8fb4" stroke-width="2"/></svg>연구원 컨디션</div>
+        <div class="slider-wrap">
+          <svg class="slider-ic" viewBox="0 0 80 96" aria-hidden="true">
+            <defs><clipPath id="bclip"><path d="M22 18 L22 60 Q22 80 40 80 Q58 80 58 60 L58 18 Z"/></clipPath></defs>
+            <rect id="beaker-liquid" x="18" y="46" width="44" height="34" fill="#ff9ec0" clip-path="url(#bclip)"/>
+            <g clip-path="url(#bclip)"><circle class="bubble" cx="34" cy="66" r="3" fill="#ffffffcc"/><circle class="bubble b2" cx="46" cy="60" r="2" fill="#ffffffaa"/></g>
+            <path d="M22 18 L22 60 Q22 80 40 80 Q58 80 58 60 L58 18" fill="none" stroke="#46b9ad" stroke-width="3" stroke-linecap="round"/>
+            <line x1="16" y1="16" x2="64" y2="16" stroke="#46b9ad" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <div class="slider-ctrl">
+            <div class="lab"><span>기분 수치</span><span><b id="mood-num">5</b> <small>/ 10</small></span></div>
+            <input type="range" id="mood" min="1" max="10" value="5" />
+          </div>
+        </div>
+
+        <div class="slider-wrap" style="margin-top:18px;">
+          <svg class="slider-ic" viewBox="0 0 80 96" aria-hidden="true">
+            <circle cx="40" cy="48" r="22" fill="#ffd27a" stroke="#f3a93c" stroke-width="3"/>
+            <path d="M18 48 l-12 -8 l4 8 l-4 8 Z" fill="#ffd27a" stroke="#f3a93c" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M62 48 l12 -8 l-4 8 l4 8 Z" fill="#ffd27a" stroke="#f3a93c" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M32 44 q8 8 16 0 M32 52 q8 8 16 0" stroke="#f3a93c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </svg>
+          <div class="slider-ctrl">
+            <div class="lab"><span>당충전 🍬</span><span><b id="sugar-num">5</b> <small>/ 10</small></span></div>
+            <input type="range" id="sugar" class="sugar" min="1" max="10" value="5" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>지난밤 수면 시간</label>
+          <div class="chips fill" id="sleep-group">
+            <button class="chip" data-val="3미만">3h↓</button><button class="chip" data-val="3-5">3~5h</button>
+            <button class="chip" data-val="5-7">5~7h</button><button class="chip" data-val="7-9">7~9h</button><button class="chip" data-val="9이상">9h↑</button>
+          </div>
+        </div>
+
+        <div class="field two-col">
+          <div><label>카페인 ☕</label><div class="chips fill" id="caffeine-group"><button class="chip" data-val="0">0잔</button><button class="chip" data-val="1">1잔</button><button class="chip" data-val="2">2잔</button><button class="chip" data-val="3+">3잔↑</button></div></div>
+        </div>
+        <div class="field">
+          <label>오늘 식사 🍚</label>
+          <div class="chips fill" id="meal-group"><button class="chip" data-val="0">0끼</button><button class="chip" data-val="1">1끼</button><button class="chip" data-val="2">2끼</button><button class="chip" data-val="3">3끼</button></div>
+        </div>
+
+        <div class="sec"><svg class="si" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="13" rx="3" fill="none" stroke="#ff8fb4" stroke-width="2"/><path d="M9 12h6v5a3 3 0 0 1-6 0z" fill="#ff8fb4"/></svg>오늘의 실험</div>
+        <div class="field" style="margin-top:6px;">
+          <label>실험 난이도</label>
+          <div class="chips fill" id="difficulty-group">
+            <button class="chip" data-val="없음"><span class="dot" style="background:#c3b9c6"></span>실험없음</button>
+            <button class="chip" data-val="쉬움"><span class="dot" style="background:#3fb27f"></span>쉬움</button>
+            <button class="chip" data-val="보통"><span class="dot" style="background:#ffc24b"></span>보통</button>
+            <button class="chip" data-val="어려움"><span class="dot" style="background:#ff8a3d"></span>어려움</button>
+            <button class="chip" data-val="극악"><span class="dot" style="background:#ef4444"></span>극악</button>
+          </div>
+        </div>
+
+        <button class="submit" id="draw-btn">⚗️ 운세 추출하기</button>
+        <p class="err" id="error-msg"></p>
+        <button class="back-link" id="back-btn">← 처음으로</button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-result">
+      <div class="brew-stage hidden" id="brew-stage">
+        <div class="brew-scene" id="brew-scene">
+          <svg class="brew-svg" viewBox="0 0 380 250" aria-hidden="true">
+            <rect x="20" y="212" width="340" height="14" rx="7" fill="#ffd2e0"/>
+            <rect x="20" y="208" width="340" height="6" rx="3" fill="#ffe6ee"/>
+            <!-- 연구원 A (왼쪽) -->
+            <g transform="translate(66,86) scale(.86)">
+              <path d="M-34 70 Q-34 55 -17 53 L17 53 Q34 55 34 70 L41 152 Q41 162 31 162 L-31 162 Q-41 162 -41 152 Z" fill="#fff" stroke="#ffd9e6" stroke-width="3"/>
+              <path d="M-7 53 L0 80 L7 53" fill="none" stroke="#ff9ec0" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="-22" cy="150" r="6" fill="#ffd0e0"/><circle cx="22" cy="150" r="6" fill="#ffd0e0"/>
+              <circle cx="0" cy="4" r="42" fill="#ffe1c8"/>
+              <path d="M-42 2 Q-38 -42 0 -42 Q38 -42 42 2 Q20 -18 0 -16 Q-20 -18 -42 2Z" fill="#7b5640"/>
+              <ellipse cx="-24" cy="16" rx="10" ry="6.5" fill="#ffb0c6"/><ellipse cx="24" cy="16" rx="10" ry="6.5" fill="#ffb0c6"/>
+              <path d="M-22 4 q7 -9 14 0" fill="none" stroke="#5a3f33" stroke-width="4" stroke-linecap="round"/>
+              <path d="M8 4 q7 -9 14 0" fill="none" stroke="#5a3f33" stroke-width="4" stroke-linecap="round"/>
+              <path d="M-7 22 q7 8 14 0" fill="none" stroke="#d97f88" stroke-width="3.2" stroke-linecap="round"/>
+            </g>
+            <!-- 연구원 B (오른쪽) -->
+            <g transform="translate(314,92) scale(.86)">
+              <path d="M-32 66 Q-32 52 -16 50 L16 50 Q32 52 32 66 L38 144 Q38 154 29 154 L-29 154 Q-38 154 -38 144 Z" fill="#fff" stroke="#ffd9e6" stroke-width="3"/>
+              <path d="M-6 50 L0 74 L6 50" fill="none" stroke="#ff9ec0" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="0" cy="2" r="40" fill="#ffe6d2"/>
+              <path d="M-40 2 Q-40 -40 0 -40 Q40 -40 40 2 Q38 -14 22 -16 L22 -2 Q0 -20 -22 -2 L-22 -16 Q-38 -14 -40 2Z" fill="#caa0c0"/>
+              <ellipse cx="-22" cy="14" rx="9.5" ry="6" fill="#ffb0c6"/><ellipse cx="22" cy="14" rx="9.5" ry="6" fill="#ffb0c6"/>
+              <circle cx="-15" cy="3" r="3.4" fill="#5a3f33"/><circle cx="15" cy="3" r="3.4" fill="#5a3f33"/>
+              <circle cx="-13.5" cy="1.5" r="1" fill="#fff"/><circle cx="16.5" cy="1.5" r="1" fill="#fff"/>
+              <path d="M-6 20 q6 6 12 0" fill="none" stroke="#d97f88" stroke-width="3.2" stroke-linecap="round"/>
+            </g>
+            <!-- 중앙 큰 비커 -->
+            <g transform="translate(150,104)">
+              <path d="M2 2 L2 50 Q2 80 34 80 Q66 80 66 50 L66 2" fill="#ffeef5" stroke="#46b9ad" stroke-width="4"/>
+              <line x1="-4" y1="2" x2="72" y2="2" stroke="#46b9ad" stroke-width="5" stroke-linecap="round"/>
+              <path class="brewliq" d="M6 44 L62 44 L62 50 Q62 76 34 76 Q6 76 6 50 Z" fill="#ffb3d1"/>
+              <circle class="bub b1" cx="22" cy="60" r="3.5" fill="#ffffffcc"/>
+              <circle class="bub b2" cx="42" cy="54" r="2.8" fill="#ffffffbb"/>
+              <circle class="bub b3" cx="32" cy="64" r="2.2" fill="#ffffffaa"/>
+            </g>
+            <!-- 스포이드 + 방울 -->
+            <g transform="translate(182,64)">
+              <rect x="-7" y="-22" width="14" height="28" rx="6" fill="#fff" stroke="#ff8fb4" stroke-width="2.5"/>
+              <rect x="-4" y="4" width="8" height="12" rx="4" fill="#ff8fb4"/>
+              <circle class="drop" cx="0" cy="20" r="4.5" fill="#ff7aa8"/>
+            </g>
+          </svg>
+          <div class="smoke"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="flash"></div>
+          <div class="pop-card" id="pop-card"></div>
+        </div>
+        <p class="brew-hint" id="brew-hint">연구원들이 운세를 조제하는 중…</p>
+      </div>
+
+      <div class="card-panel result hidden" id="result-card">
+        <div class="react" id="react-zone">
+          <div class="floats" id="react-floats"></div>
+          <img class="reactimg" id="react-img" alt="오늘의 짤" style="display:none" />
+          <div class="face" id="react-emoji" style="display:none"></div>
+        </div>
+        <div class="result-body">
+          <div class="grade-meme" id="r-grade">럭키비키</div>
+          <div class="grade-trad" id="r-trad">1등급 · 초대박</div>
+          <h3 class="headline" id="r-headline"></h3>
+          <p class="message" id="r-message"></p>
+          <div class="meta-row">
+            <span class="meta" id="r-date">📅 —</span>
+            <span class="meta" id="r-luck">🍀 행운숫자 —</span>
+            <span class="meta" id="r-difficulty">난이도 · —</span>
+          </div>
+          <div class="tipbox">
+            <div class="tt">🔮 오늘의 한 줄 점괘</div>
+            <p id="r-tip"></p>
+          </div>
+          <div class="actions">
+            <button class="ghost" id="share-btn">↗ 공유</button>
+            <button class="ghost" id="again-btn">🔄 다시 뽑기</button>
+          </div>
+        </div>
+      </div>
+      <p class="foot">✦ 운세는 재미로, 오늘도 즐거운 실험 ✦ · 이모지 Microsoft Fluent Emoji (MIT)</p>
+    </section>
+  </div>
+
+  <script>
+  const $=(id)=>document.getElementById(id);
+  const pick=(a)=>a[Math.floor(Math.random()*a.length)];
+  const state={temp:null,humidity:null,mood:5,sugar:5,sleep:null,day:null,caffeine:null,meal:null,difficulty:null,date:''};
+  let lastResult=null, flipBusy=false, flipDone=false;
+
+  function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+  $('start-btn').addEventListener('click',()=>show('screen-form'));
+  $('back-btn').addEventListener('click',()=>show('screen-opening'));
+
+  const DAYS=['일','월','화','수','목','금','토'];
+  function weekdayOf(iso){const p=(iso||'').split('-').map(Number);if(p.length!==3)return '';const d=new Date(p[0],p[1]-1,p[2]);return DAYS[d.getDay()];}
+  function syncDay(){const w=weekdayOf(state.date);state.day=w;$('day-badge').textContent=w?(w+'요일'):'— 요일';}
+  (function(){const d=new Date();const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;$('exp-date').value=iso;state.date=iso;syncDay();})();
+  $('exp-date').addEventListener('change',(e)=>{state.date=e.target.value;syncDay();});
+
+  function chipGroup(gid,key){const g=$(gid);g.addEventListener('click',(e)=>{const b=e.target.closest('.chip');if(!b)return;g.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));b.classList.add('active');state[key]=b.dataset.val;});}
+  chipGroup('sleep-group','sleep');chipGroup('caffeine-group','caffeine');chipGroup('meal-group','meal');chipGroup('difficulty-group','difficulty');
+
+  function updateBeaker(m){const top=18,bottom=80,usable=bottom-top;const h=Math.max(4,(m/10)*usable);const liq=$('beaker-liquid');liq.setAttribute('y',bottom-h);liq.setAttribute('height',h);liq.setAttribute('fill',m>=7?'#ff9ec0':m>=4?'#ffc0d8':'#ffd9b0');}
+  $('mood').addEventListener('input',(e)=>{state.mood=Number(e.target.value);$('mood-num').textContent=e.target.value;updateBeaker(state.mood);});
+  updateBeaker(5);
+  $('sugar').addEventListener('input',(e)=>{state.sugar=Number(e.target.value);$('sugar-num').textContent=e.target.value;});
+
+  async function fetchWeather(lat,lon){const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m`;const res=await fetch(url);if(!res.ok)throw new Error('날씨 서비스 응답 오류. 잠시 후 다시 시도하세요.');const j=await res.json();const c=j&&j.current;if(!c||c.temperature_2m==null||c.relative_humidity_2m==null)throw new Error('현재 위치의 기온/습도를 가져오지 못했습니다.');return{temp:Math.round(c.temperature_2m),humidity:Math.round(c.relative_humidity_2m),observedAt:c.time||''};}
+  $('weather-btn').addEventListener('click',()=>{const hint=$('weather-hint');if(!navigator.geolocation){hint.textContent='이 브라우저는 위치 기능을 지원하지 않습니다.';return;}hint.textContent='📍 위치를 확인하는 중…';navigator.geolocation.getCurrentPosition(async(pos)=>{hint.textContent='☁️ 날씨를 가져오는 중…';try{const{latitude,longitude}=pos.coords;const d=await fetchWeather(latitude,longitude);state.temp=d.temp;state.humidity=d.humidity;$('temp-display').textContent=`${d.temp}℃`;$('humid-display').textContent=`${d.humidity}%`;hint.textContent=`✨ 날씨를 불러왔습니다${d.observedAt?` (${d.observedAt} 기준)`:''}.`;}catch(err){hint.textContent='⚠️ '+err.message;}},()=>{hint.textContent='⚠️ 위치 권한이 거부되었습니다. 주소창의 위치 권한을 허용해 주세요.';},{enableHighAccuracy:false,timeout:10000});});
+
+  const TIERS=[
+    {min:6, g:1, trad:'1등급 · 초대박', s:'pos', face:'🤩', svg:'img/jackpot.svg',
+     memes:['완전 럭키비키🍀','폼 미쳤다🔥','거제야호🎉','갓생 예약✨','오늘 내가 주인공','우주의 기운 영끌'],
+     imgs:['img/free/g1/g1-1.png','img/free/g1/g1-2.png','img/free/g1/g1-3.png']},
+    {min:4, g:2, trad:'2등급 · 대길', s:'pos', face:'😆', svg:'img/daebak.svg',
+     memes:['럭키비키잖아~','가보자고🚀','오늘 야르하다✨','폼 미쳤따리','킹정👑','도파민 만렙'],
+     imgs:['img/free/g2/g2-1.png','img/free/g2/g2-2.png','img/free/g2/g2-3.png']},
+    {min:2, g:3, trad:'3등급 · 길', s:'pos', face:'😊', svg:'img/good.svg',
+     memes:['개이득(ㄱㅇㄷ)','오늘 좀 되는데?','은근 야르함','선녀강림','슬기로운 실험생활','나쁘지 않아 굿'],
+     imgs:['img/free/g3/g3-1.png','img/free/g3/g3-2.png','img/free/g3/g3-3.png']},
+    {min:0, g:4, trad:'4등급 · 평', s:'neu', face:'🙂', svg:'img/soso.svg',
+     memes:['그럴 수 있어','반반무많이','쏘쏘~ 무난','중꺾마💪','평타는 친다','이븐하게 흘러감'],
+     imgs:['img/free/g4/g4-1.png','img/free/g4/g4-2.png','img/free/g4/g4-3.png']},
+    {min:-2, g:5, trad:'5등급 · 소흉', s:'neg', face:'😅', svg:'img/oops.svg',
+     memes:['어우야...','삐끗 예감','음, 글쎄다','롤러코스터각','긴장 좀 타자','애매하다 애매해'],
+     imgs:['img/free/g5/g5-1.png','img/free/g5/g5-2.png','img/free/g5/g5-3.png']},
+    {min:-4, g:6, trad:'6등급 · 흉', s:'neg', face:'😔', svg:'img/ugh.svg',
+     memes:['오늘만 버티자','킹받는 예감','노답주의ㅋㅋ','현타 직배송','조용히 가자','어림도 없지'],
+     imgs:['img/free/g6/g6-1.png','img/free/g6/g6-2.png','img/free/g6/g6-3.png']},
+    {min:-Infinity, g:7, trad:'7등급 · 대흉', s:'neg', face:'😌', svg:'img/doom.svg',
+     memes:['오늘은 글렀다ㅋㅋ','이번 생 실험은…','집에 갈까?','별이 숨었다','우주가 날 시험한다','그저 웃지요😇'],
+     imgs:['img/free/g7/g7-1.png','img/free/g7/g7-2.png','img/free/g7/g7-3.png']},
+  ];
+  const FLOATS={pos:['🍀','✨','🎉','💗'],neu:['☕','🍚','➖'],neg:['💦','🌀','😮‍💨']};
+  const HEADLINES={
+    1:['오늘의 흐름, 완벽히 그대 편','손대는 족족 결과가 따라온다','오래 기다린 한 방이 터질 날','직감이 정확히 들어맞는다'],
+    2:['막힘없이 풀려가는 하루','노력한 만큼 정직하게 나온다','타이밍이 기막히게 맞는다','자신감이 결과로 이어진다'],
+    3:['은근히 잘 풀리는 하루','꾸준함이 빛을 보는 날','작은 행운이 곳곳에 숨은 날','기분 좋은 신호들이 온다'],
+    4:['딱 평소만큼의 하루','무난하게 흘러간다','큰 변수 없이 차분히','기복 없는 안정적인 날'],
+    5:['살짝 엇박자 나는 날','생각보다 더딜 수 있다','집중이 흩어지기 쉬운 날','작은 변수에 흔들리는 날'],
+    6:['뜻대로 안 풀리는 하루','한 박자씩 어긋나는 날','괜히 꼬이는 느낌의 날','오늘은 기대를 낮추자'],
+    7:['오늘따라 안 맞는 날','우주가 장난을 거는 날','웃으며 넘기는 게 정답','내일을 기약하는 하루'],
+  };
+  const OPEN={
+    pos:['오늘의 컨디션 지표가 보기 좋게 맞물려 있다.','여러 신호가 한 방향으로 정렬한 하루다.','준비해 온 것들이 제값을 할 흐름이다.','평소보다 판단이 빠르고 정확할 날이다.','작은 우연들이 그대를 거들어 줄 것이다.','감이 좋을 때 망설이지 않으면 결과가 따라온다.'],
+    neu:['오늘은 크게 좋지도 나쁘지도 않은, 평소의 하루다.','특별한 변수 없이 무난하게 흘러갈 흐름이다.','기복이 적어 차분히 집중하기 좋은 날이다.','눈에 띄는 행운도, 큰 걸림돌도 보이지 않는다.','평탄함이 곧 오늘의 강점이 되는 하루다.'],
+    neg:['오늘은 흐름이 살짝 어긋나 있는 날이다.','작은 변수들이 겹쳐 더디게 느껴질 수 있다.','기대만큼 속도가 안 날 가능성이 있는 하루다.','집중이 자주 끊길 수 있으니 마음을 가볍게 가져가자.','뜻대로 안 되더라도 너무 담아두지 않는 게 좋다.'],
+  };
+  const SLEEP={'3미만':'거의 못 잔 탓에 오전 페이스는 다소 무거울 수 있고,','3-5':'짧게 잔 영향으로 집중이 군데군데 끊길 수 있으나,','5-7':'조금 부족한 잠에도 큰 무리 없이 움직일 수 있고,','7-9':'충분히 잔 덕분에 머리가 맑게 돌아가며,','9이상':'푹 쉰 만큼 여유로운 페이스로 시작할 수 있으니,'};
+  function moodLine(m){return m>=7?'기분이 좋은 날엔 평소보다 손이 잘 맞아 들어간다.':m<=3?'마음이 가라앉은 날일수록 욕심을 줄이고 가는 편이 낫다.':'평정심을 유지하면 무난한 결과로 이어질 것이다.';}
+  function weatherLine(t,h){return t>=30?' 더운 날씨엔 능률이 처지기 쉬우니 페이스 조절이 포인트다.':t<=5?' 추운 날엔 시작이 더딜 수 있으니 워밍업이 도움이 된다.':h>78?' 습한 날엔 집중이 늘어지기 쉬우니 짧게 끊어 가는 게 좋다.':'';}
+  function energyLine(sugar,caf){
+    const c=caf==='3+'?3:Number(caf||0);
+    if(sugar>=7&&c>=1)return ' 당과 카페인이 채워져 오전 텐션은 충분하다.';
+    if(sugar<=3&&c===0)return ' 에너지가 살짝 비어 있으니 가벼운 당 충전이 도움이 된다.';
+    if(c>=3)return ' 카페인이 다소 과하니 오후엔 페이스가 들쭉날쭉할 수 있다.';
+    if(sugar>=7)return ' 당이 충분해 집중의 불씨는 잘 붙는 편이다.';
+    return ' 에너지는 무난한 수준이라 페이스 유지가 관건이다.';
+  }
+  const CLOSE={
+    pos:['감이 올 때 망설이지 말고 밀어붙여도 좋은 날이다.','미뤄둔 작업이 있다면 오늘 손대보면 잘 풀릴 것이다.','잘 되면 과정을 기록해 두자 — 다음에도 그대로 써먹을 수 있다.','오늘의 결과는 그대의 준비가 만든 것이니 자신을 믿어도 된다.'],
+    neu:['한 번에 하나씩 처리하면 무난하게 마무리될 것이다.','큰 욕심만 내려놓으면 기대 이상의 평온함을 얻는다.','평범하게 잘 끝내는 것도 충분히 좋은 하루다.','서두르지 않아도 되는 날이니 페이스대로 가자.'],
+    neg:['뜻대로 안 풀려도 가볍게 넘기면 그만인 날이다.','오늘 안 되는 건 내일 다시 보면 의외로 쉽게 풀린다.','기대를 살짝 낮추면 오히려 마음이 편해진다.','잘 안 되는 날도 있는 법, 웃으며 마무리하면 된다.'],
+  };
+  const TIP={
+    '없음':['오늘은 실험이 없는 날 — 밀린 논문이나 커피 한 잔의 여유를 즐겨도 좋다.','실험대를 잠시 떠나는 것도 훌륭한 연구의 일부다.','쉬어가는 날일수록 다음 실험 아이디어가 슬며시 떠오르곤 한다.'],
+    '쉬움':['쉬운 작업일수록 방심이 변수 — 그래도 오늘은 평소 루틴만 지키면 깔끔하다.','여유가 있는 날이니 남는 시간엔 데이터 정리를 해두면 미래의 내가 고마워한다.','익숙한 일도 한 번 더 보면 작은 이득이 따라온다.'],
+    '보통':['오늘의 페이스가 곧 결과의 완성도 — 한 단계씩 매듭짓고 가자.','순서만 평소대로 지키면 무난하게 흘러간다.','계량은 두 번 보고 한 번에 — 그 한 박자가 하루를 매끄럽게 만든다.'],
+    '어려움':['난도가 있는 날일수록 여유 시간이 최고의 무기 — 단계마다 숨 한 번 고르자.','오늘은 멀티태스킹보다 하나에 집중하는 편이 결과가 좋다.','변수는 미리 메모해 두면 절반은 잡은 셈이다.'],
+    '극악':['극악 난도지만 오늘의 그대라면 한 단계씩 차근차근 가면 된다.','까다로운 만큼, 서두름만 버리면 의외로 길이 보인다.','어려운 날일수록 작은 성공 하나하나에 스스로를 칭찬해 주자.'],
+  };
+
+  function luckyNumber(iso){const digits=(iso||'').replace(/\D/g,'');let s=0;for(const ch of digits)s+=Number(ch);while(s>9)s=String(s).split('').reduce((a,b)=>a+Number(b),0);return s||7;}
+  function computeScore(s){
+    let v=0;
+    v+=({'3미만':-3,'3-5':-1.5,'5-7':0.5,'7-9':2.5,'9이상':1.5})[s.sleep]??0;
+    v+=(Number(s.mood)-5)*0.5;
+    v+=(Number(s.sugar)-5)*0.3;
+    v+=({'0':-1.5,'1':0,'2':0.7,'3':1})[s.meal]??0;
+    v+=({'0':-0.3,'1':0.4,'2':0.2,'3+':-0.4})[s.caffeine]??0;
+    const t=Number(s.temp),h=Number(s.humidity);
+    if(t>=18&&t<=25)v+=1;else if(t>=30||t<=5)v-=1;
+    if(h>75)v-=0.5;
+    v+=({'없음':0.5,'쉬움':1,'보통':0,'어려움':-1,'극악':-2})[s.difficulty]??0;
+    v+=(Math.random()-0.5);
+    return v;
+  }
+  function buildFortune(s){
+    const v=computeScore(s);
+    const tier=TIERS.find(t=>v>=t.min);
+    const cond=`${SLEEP[s.sleep]||''} ${moodLine(Number(s.mood))}${weatherLine(Number(s.temp),Number(s.humidity))}`.trim();
+    const energy=energyLine(Number(s.sugar),s.caffeine).trim();
+    let tip=pick(TIP[s.difficulty]||TIP['보통']);
+    if(v<=-2)tip+=' 그리고 오늘 안 풀리는 건 그대 탓이 아니라 그냥 날이 그런 거다. 😌';
+    const dt=(s.date||'').split('-');
+    const dateLabel=dt.length===3?`${dt[0]}.${dt[1]}.${dt[2]}${s.day?` (${s.day})`:''}`:'오늘';
+    return {tier, meme:pick(tier.memes), trad:tier.trad,
+      headline:pick(HEADLINES[tier.g]),
+      message:[pick(OPEN[tier.s]),cond,energy,pick(CLOSE[tier.s])].filter(Boolean).join(' '),
+      tip, difficulty:s.difficulty, dateLabel, luck:luckyNumber(s.date), memeSrc:pick(tier.imgs)};
+  }
+
+  $('draw-btn').addEventListener('click',()=>{
+    const err=$('error-msg');err.textContent='';
+    const miss=[];
+    if(state.temp===null||state.humidity===null)miss.push('날씨(현재 위치)');
+    if(!state.date)miss.push('실험 날짜');
+    if(!state.sleep)miss.push('수면 시간');
+    if(!state.caffeine)miss.push('카페인');
+    if(!state.meal)miss.push('식사');
+    if(!state.difficulty)miss.push('실험 난이도');
+    if(miss.length){err.textContent=`다음 항목을 채워주세요 → ${miss.join(', ')}`;return;}
+
+    const d=buildFortune(state);lastResult=d;
+    fillResult(d);
+    const pre=new Image();pre.onerror=()=>{d.memeSrc=d.tier.svg;};pre.src=d.memeSrc; // 미리 로드
+
+    show('screen-result');
+    $('result-card').classList.add('hidden');
+    $('brew-stage').classList.remove('hidden');
+    runBrew((popCard)=>{
+      setTimeout(()=>{ // 나온 카드 → 가운데 둥 → 위로 도킹
+        const card=popCard.getBoundingClientRect();
+        $('brew-stage').classList.add('hidden');
+        startFloat(card);
+        if(d.tier.s==='pos') fireConfetti(d.tier.g);
+      },550);
+    });
+  });
+
+  // 연구원 조제 연출: 방울 → 부글/연기 → 펑 → 타로카드 등장
+  function runBrew(onDone){
+    const scene=$('brew-scene');
+    scene.classList.remove('brewing','boom','card-out');
+    $('brew-hint').textContent='연구원들이 운세를 조제하는 중…';
+    setTimeout(()=>scene.classList.add('brewing'),120);
+    setTimeout(()=>{ scene.classList.add('boom'); $('brew-hint').textContent='펑! 💥'; brewBurst(); },1850);
+    setTimeout(()=>{ scene.classList.remove('brewing'); scene.classList.add('card-out'); },1990);
+    setTimeout(()=>{ $('brew-hint').textContent='타로 카드가 나왔어요!'; onDone($('pop-card')); },2680);
+  }
+  function brewBurst(){
+    const r=$('brew-scene').getBoundingClientRect();
+    const cx=r.left+r.width*0.48, cy=r.top+r.height*0.40;
+    const emo=['✨','💥','💗','⭐','🎉','💫'];
+    for(let i=0;i<20;i++){const s=document.createElement('div');s.className='brew-burst';s.textContent=emo[i%emo.length];
+      const ang=(i/20)*6.283, rad=220+Math.random()*230;
+      s.style.left=(cx-16)+'px';s.style.top=(cy-16)+'px';
+      s.style.setProperty('--bx',(Math.cos(ang)*rad).toFixed(0)+'px');
+      s.style.setProperty('--by',(Math.sin(ang)*rad).toFixed(0)+'px');
+      document.body.appendChild(s);setTimeout(()=>s.remove(),900);}
+  }
+
+  function fillResult(d){
+    $('react-zone').className='react s-'+d.tier.s;
+    $('result-card').className='card-panel result hidden s-'+d.tier.s;
+    $('r-grade').textContent=d.meme;
+    $('r-trad').textContent=d.trad;
+    $('r-headline').textContent=d.headline;
+    $('r-message').textContent=d.message;
+    $('r-tip').textContent=d.tip;
+    $('r-date').textContent='📅 '+d.dateLabel;
+    $('r-luck').textContent='🍀 행운숫자 '+d.luck;
+    $('r-difficulty').textContent='난이도 · '+d.difficulty;
+  }
+
+  function startFloat(card){
+    const d=lastResult; if(!d)return;
+    if(!d.memeSrc){
+      const rc=$('result-card');rc.classList.remove('hidden');rc.classList.add('reveal');
+      $('react-img').style.display='none';$('react-emoji').style.display='block';$('react-emoji').textContent=d.tier.face;
+      placeFloats(d);finishActions();return;
+    }
+    const cx=card.left+card.width/2, cy=card.top+card.height/2;
+    const sz=Math.min(window.innerWidth*0.92, 560);
+    const ov=document.createElement('img');ov.src=d.memeSrc;ov.className='float-meme pop';
+    ov.onerror=()=>{ov.onerror=null;d.memeSrc=d.tier.svg;ov.src=d.tier.svg;};
+    ov.style.width=sz+'px';ov.style.height=sz+'px';ov.style.left=(cx-sz/2)+'px';ov.style.top=(cy-sz/2)+'px';
+    document.body.appendChild(ov);
+    spark(cx,cy);
+    setTimeout(()=>dockUp(ov,d),820);
+  }
+
+  function fireConfetti(grade){
+    const cvs=$('confetti');if(!cvs)return;const ctx=cvs.getContext('2d');
+    cvs.width=window.innerWidth;cvs.height=window.innerHeight;
+    const colors=['#ff8fb4','#ffd27a','#7fd3c8','#b07be0','#ff6f9c','#8ee6d2','#ffe066'];
+    const N=grade<=1?180:grade===2?130:95;
+    const parts=[];
+    for(let i=0;i<N;i++){parts.push({x:cvs.width/2+(Math.random()-.5)*180,y:cvs.height*0.3,
+      vx:(Math.random()-.5)*11,vy:Math.random()*-13-4,gg:0.3+Math.random()*0.12,
+      s:6+Math.random()*7,rot:Math.random()*6.28,vr:(Math.random()-.5)*0.3,
+      c:colors[(Math.random()*colors.length)|0]});}
+    let raf,t0=null;
+    function frame(ts){if(t0===null)t0=ts;const el=ts-t0;
+      ctx.clearRect(0,0,cvs.width,cvs.height);let alive=false;
+      for(const p of parts){p.vy+=p.gg;p.x+=p.vx;p.y+=p.vy;p.vx*=0.99;p.rot+=p.vr;
+        if(p.y<cvs.height+30)alive=true;
+        ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.globalAlpha=Math.max(0,1-el/2600);
+        ctx.fillStyle=p.c;ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.62);ctx.restore();}
+      if(alive&&el<2800){raf=requestAnimationFrame(frame);}else{ctx.clearRect(0,0,cvs.width,cvs.height);}
+    }
+    cancelAnimationFrame(raf);requestAnimationFrame(frame);
+  }
+  function spark(cx,cy){['✨','💫','⭐'].forEach((e,i)=>{const s=document.createElement('div');s.className='sparkburst';s.textContent=e;s.style.left=(cx-16+(i-1)*46)+'px';s.style.top=(cy-60)+'px';s.style.animationDelay=(i*0.08)+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),900);});}
+  function dockUp(ov,d){
+    const rc=$('result-card');rc.classList.remove('hidden');rc.classList.add('reveal');
+    const slot=$('react-img');
+    slot.onerror=()=>{slot.onerror=null;slot.src=d.tier.svg;};slot.src=d.memeSrc;slot.style.display='block';slot.style.visibility='hidden';
+    requestAnimationFrame(()=>{
+      const r=slot.getBoundingClientRect();
+      ov.classList.remove('pop');
+      ov.style.left=r.left+'px';ov.style.top=r.top+'px';ov.style.width=r.width+'px';ov.style.height=r.height+'px';
+      let done=false;
+      const fin=()=>{if(done)return;done=true;slot.style.visibility='visible';ov.remove();placeFloats(d);finishActions();flipBusy=false;};
+      ov.addEventListener('transitionend',fin,{once:true});
+      setTimeout(fin,1100);
+    });
+  }
+  function placeFloats(d){const fl=$('react-floats');fl.innerHTML='';const arr=FLOATS[d.tier.s];const pos=[[8,22],[86,18],[12,72],[84,68]];arr.forEach((emo,i)=>{const sp=document.createElement('span');sp.textContent=emo;const p=pos[i%pos.length];sp.style.left=p[0]+'%';sp.style.top=p[1]+'%';sp.style.animationDelay=(-i*0.4)+'s';fl.appendChild(sp);});}
+  function finishActions(){window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});}
+
+  $('again-btn').addEventListener('click',()=>show('screen-form'));
+  $('share-btn').addEventListener('click',async()=>{
+    if(!lastResult)return;
+    const text=`🧪 오늘의 실험실 운세\n[${lastResult.meme}] ${lastResult.headline}\n\n${lastResult.message}`;
+    try{if(navigator.share){await navigator.share({title:'실험실 컨디션 운세소',text,url:location.href});}
+      else{await navigator.clipboard.writeText(text+'\n'+location.href);const b=$('share-btn'),o=b.textContent;b.textContent='✓ 복사됨!';setTimeout(()=>b.textContent=o,1500);}}catch(e){}
+  });
+  </script>
+</body>
+</html>

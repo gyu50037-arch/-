@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 340" font-family="'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif">
+  <rect width="320" height="340" rx="26" fill="#eafbe2"/>
+  <text x="44" y="110" font-size="34">🚀</text>
+  <text x="250" y="96" font-size="28">✨</text>
+  <g fill="#9fdb6e"><rect x="42" y="150" width="12" height="12" rx="3" transform="rotate(20 48 156)"/><rect x="266" y="160" width="12" height="12" rx="3" transform="rotate(-18 272 166)"/></g>
+  <circle cx="160" cy="142" r="74" fill="#ffe0bd"/>
+  <ellipse cx="124" cy="160" rx="14" ry="9" fill="#ffb3c4" opacity=".75"/>
+  <ellipse cx="196" cy="160" rx="14" ry="9" fill="#ffb3c4" opacity=".75"/>
+  <path d="M110 138 q14 -16 28 0" fill="none" stroke="#3a3550" stroke-width="6" stroke-linecap="round"/>
+  <path d="M182 138 q14 -16 28 0" fill="none" stroke="#3a3550" stroke-width="6" stroke-linecap="round"/>
+  <path d="M128 162 Q160 200 192 162 Q160 178 128 162 Z" fill="#9c3a3a"/>
+  <rect x="34" y="262" width="252" height="48" rx="24" fill="#3fbf57"/>
+  <text x="160" y="294" font-size="26" fill="#fff" text-anchor="middle">가보자고 🚀</text>
+</svg>
